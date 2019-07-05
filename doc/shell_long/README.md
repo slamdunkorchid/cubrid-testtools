@@ -334,7 +334,7 @@ job_shell_long.test.1.queue=QUEUE_CUBRID_QA_SHELL_LONG_LINUX
 
 
 ## 4.1 Daily regression test
-When the build server has a new build, a shell_long test will be executed. If there is something wrong and need to run shell_long test again, you can send a test message. 
+When the build server has a new build, a shell_long test can be executed. If there is something wrong and need to run shell_long test again, you can send a test message. 
 ### Send a test message
 1. go to controller node, check `~/CTP/conf/shell_template_for_shell_long.conf`. This config file is only for regression test. We usually don't modify it except we have new test nodes.
 2. login `message@192.168.1.91` and send test message.  
@@ -343,64 +343,186 @@ By default, it will find the `~/CTP/conf/shell_template_for_shell_long.conf` to 
 sender.sh QUEUE_CUBRID_QA_SHELL_LONG_LINUX http://192.168.1.91:8080/REPO_ROOT/store_01/10.2.0.8268-6e0edf3/drop/CUBRID-10.2.0.8268-6e0edf3-Linux.x86_64.sh shell_long default
 ```
 
-## 4.2 Verify test Results
-### Check if there is the test result
-Go to QA homepage and click the CI build, wait for the page loading, see the 'Function' tab and find the shell_long
-result.  
-![verify_func_tab](./doc/media/image1.png)   
+## 4.2 Verify test Results  
+### Check if there is the test result  
+Go to QA homepage and click the CI build, wait for the page loading, see the 'Function' tab and find the shell_long result.    
+![verify_func_tab](./media/image1.png)   
 The category `shell_long` links to the current completed test cases  
-![completed_test_cases](./doc/media/image2.png)  
-The numbers of `Fail` tag links to the failures, it includes total failures and new failures of this build compared with previous build.      
-![fail_test_cases](./doc/media/image3.png)    
+![completed_test_cases](./media/image2.png)  
+The numbers of `Fail` tag links to the failures, it includes total failures and new failures of this build compared with previous build.        
+![fail_test_cases](./media/image3.png)    
 If it shows **'NO RESULT (OR RUNNING)'** as bellow, maybe you can check whether the crontab task time has not arrived or the test environments have problem.      
-![verify_no_result](./doc/media/image4.png)    
+![verify_no_result](./media/image4.png)      
 Here's what you might encounter:    
-* Test message is in the queue(test is not started) 
-  Sometimes there is another test executed such as RQG test,shell_heavy test or code coverage test. In this case, just wait for other test finish.  
+* Test message is in the queue(test is not started)   
+  Sometimes there is another test executed such as RQG test,shell_heavy test or code coverage test. In this case, just wait for another test to complete.   
 * Insufficient disk space  
-  Some test case executed failed ,and on `Total` tag  of `Fail` column, we may see `Server crash graphic identifier`
-![Server_crash_graphic_identifier](./doc/media/image5.png)      
-* Test is not finished  
-    * Sometimes there is another test executed such as RQG test,shell_heavy test or code coverage test. In this case, just wait for the test finish and then verify the results.  
-    * If the CI build comes on time as usual, then you need to check why the test is so slow. It may because there is a server crash, server hangs up, or performance drop. In this case, you need to open a bug.  
-4.2 Verify test Results
-Result overview
-qahome -> select build number ->choose tab ‘Performance’
-result overview Then, select a build as baseline to compare the current result to it.
-result_comparation
-Usually, in daily regression test, we choose the previous CI build as baseline.
+  Some test case executed failed ,and on `Total` tag  of `Fail` column, we may see `Server crash graphic identifier`   
+![Server_crash_graphic_identifier](./media/image5.png)      
+* Test is not finished as expected  
+  If the CI build comes on time as usual, then you need to check why the test is so slow. It may because there is a server crash, server hangs up, or performance drop. In this case, you need to open a bug.   
+  
+### Check Failures   
+failures: http://10.113.153.154:10086/qaresult/showFailResult.nhn?m=showFailVerifyItem&statid=21980&srctb=shell_main&failType=shell#  
+![fail_list](./doc/media/image6.png)   
+Click each case to see [`Case` and `Running log`](http://10.113.153.154:10086/qaresult/showfile.nhn?m=showCaseFile&statid=21980&itemid=2140696&tc=shell_long&buildId=10.2.0.8369-5a75e41&filePath=longcase/shell/1hour/bug_bts_5824/cases/bug_bts_5824.sh&isSuccessFul=false) 
+![details](./doc/media/image7.png)  
 
-Check the configurations
-check conf1 Click the red part to confirm whether the configurations of this test is expected.
-check conf2
+test code:  
+```
+if [ $cnt -lt 10 ]
+then
 
-Check the resource utilization
-check_resource1 Click the link under‘Resource Utilization’ to check the resource utilization of the test.
+   write_ok
+else
+   write_nok
+fi
 
-Check the resource graph check_resource2
-Check the raw data if necessary
-check_resource3 Click ‘Raw data for Test’in the picture above, and go to this page:
-check_resource4 In this page, we can see the raw data which is generated in the test.
-Server and broker error logs
-Login the server and broker machines, check the logs.
-The logs are remained at ~/dblog/, for example, ‘dblog/10.2.0.8335-45cec1b_M20190416033710/log’.
-Check whether there is any ‘ERROR’in the logs.
-Error that can be ignored most of the time:
-ERROR_CODE = -670 (Operation would have caused one or more unique constraint violations)
-If the count of this error is not too much (such as less than 100), you can ignore it.
+```
+fail reason:  
+```
++ cnt=17
++ '[' 17 -lt 10 ']'
++ write_nok
++ '[' -z '' ']'
++ echo '----------------- 1 : NOK'
+----------------- 1 : NOK
++ echo 'bug_bts_5824-1 : NOK'
+++ wc -l
+```
+## 4.3 Code coverage test  
+Code coverage test starts on the last Sunday of each month.      
+You can find the setting from http://10.113.153.154:10086/qaresult/job/job.conf     
+```
+#######################################################################
+job_codecoverage.service=ON
+job_codecoverage.crontab=0 1 10 ? * 7L
+job_codecoverage.listenfile=cubrid-{1}.tar.gz
+job_codecoverage.acceptversions=10.2.*
+job_codecoverage.package_bits=64
+job_codecoverage.package_type=general
 
-4.3	Report issues
-Crash issue
-If there is a crash, report it following the rules in this link: ‘How to Report Regression Crash Issues’
+job_codecoverage.test.1.scenario=gcov_package
+job_codecoverage.test.1.queue=QUEUE_CUBRID_QA_CODE_COVERAGE
+#######################################################################
+job_coverage_test.service=ON
+job_coverage_test.crontab=0/7 * * * * ?
+job_coverage_test.listenfile=CUBRID-{1}-gcov-linux.x86_64.tar.gz
+job_coverage_test.listenfile.1=cubrid-{1}-gcov-src-linux.x86_64.tar.gz
+job_coverage_test.acceptversions=10.2.*
+job_coverage_test.package_bits=64
+job_coverage_test.package_type=coverage
 
-Performance issue
-If the performance is dropped on the test build, retest this build to confirm the result. Then report it on jira.
+job_coverage_test.test.15.scenario=shell_long
+job_coverage_test.test.15.queue=QUEUE_CUBRID_QA_SHELL_LONG_LINUX
+```
+### Verify code coverage testing result  
+Go to QA homepage and find the 'code coverage' node in the left area, click the link of latest result.  
+![code_cov](./media/image8.png)     
+Click the `shell_long` link.  
+![code_cov_tpcc](./media/image9.png)     
+There is a coverage rate of lines. Its coverage rate of lines is usually in 40%~42%.   
+![code_cov_tpcc2](./media/image10.png)     
 
+### Send code coverage testing message    
+login `message@192.168.1.91`    
+Using the `sender_code_coverage_testing_message.sh` to send a code coverate test message.   
+>
+```bash
+$ cd ~/manual
+$ sh sender_code_coverage_testing_message.sh
+Usage: sh  sender_code_coverage_testing_message queue url1 url2 category
+``` 
+Send code coverage test message:  
+```bash
+$ cd ~/manual
+$ sh sender_code_coverage_testing_message.sh QUEUE_CUBRID_QA_SHELL_LONG_LINUX http://192.168.1.91:8080/REPO_ROOT/store_01/10.2.0.8270-c897055/drop/CUBRID-10.2.0.8270-c897055-gcov-Linux.x86_64.tar.gz http://192.168.1.91:8080/REPO_ROOT/store_01/10.2.0.8270-c897055/drop/cubrid-10.2.0.8270-c897055-gcov-src-Linux.x86_64.tar.gz shell_long    
+Queue:QUEUE_CUBRID_QA_SHELL_LONG_LINUX
+Build URL:http://192.168.1.91:8080/REPO_ROOT/store_01/10.2.0.8270-c897055/drop/CUBRID-10.2.0.8270-c897055-gcov-Linux.x86_64.tar.gz
+Source URL:http://192.168.1.91:8080/REPO_ROOT/store_01/10.2.0.8270-c897055/drop/cubrid-10.2.0.8270-c897055-gcov-src-Linux.x86_64.tar.gz
+Category:shell_long
+
+Message: 
+
+Message Content: Test for build 10.2.0.8270-c897055 by CUBRID QA Team, China
+MSG_ID = 190705-165519-836-000001
+MSG_PRIORITY = 4
+BUILD_ABSOLUTE_PATH=/home/ci_build/REPO_ROOT/store_01/10.2.0.8270-c897055/drop
+BUILD_BIT=0
+BUILD_CREATE_TIME=1551930752000
+BUILD_GENERATE_MSG_WAY=MANUAL
+BUILD_ID=10.2.0.8270-c897055
+BUILD_IS_FROM_GIT=1
+BUILD_PACKAGE_PATTERN=CUBRID-{1}-gcov-Linux.x86_64.tar.gz
+BUILD_SCENARIOS=shell_long
+BUILD_SCENARIO_BRANCH_GIT=develop
+BUILD_SEND_DELAY=10382567
+BUILD_SEND_TIME=1562313319834
+BUILD_STORE_ID=store_01
+BUILD_SVN_BRANCH=RB-10.2.0
+BUILD_SVN_BRANCH_NEW=RB-10.2.0
+BUILD_TYPE=coverage
+BUILD_URLS=http://192.168.1.91:8080/REPO_ROOT/store_01/10.2.0.8270-c897055/drop/CUBRID-10.2.0.8270-c897055-gcov-Linux.x86_64.tar.gz
+BUILD_URLS_1=http://192.168.1.91:8080/REPO_ROOT/store_01/10.2.0.8270-c897055/drop/cubrid-10.2.0.8270-c897055-gcov-src-Linux.x86_64.tar.gz
+BUILD_URLS_CNT=2
+BUILD_URLS_KR=http://192.168.1.91:8080/REPO_ROOT/store_01/10.2.0.8270-c897055/drop/CUBRID-10.2.0.8270-c897055-gcov-Linux.x86_64.tar.gz
+BUILD_URLS_KR_1=http://192.168.1.91:8080/REPO_ROOT/store_01/10.2.0.8270-c897055/drop/cubrid-10.2.0.8270-c897055-gcov-src-Linux.x86_64.tar.gz
+MKEY_COVERAGE_UPLOAD_DIR=/home/codecov/cc4c/result
+MKEY_COVERAGE_UPLOAD_IP=192.168.1.98
+MKEY_COVERAGE_UPLOAD_PWD=uV9b3KMp5%%
+MKEY_COVERAGE_UPLOAD_USER=codecov
+
+
+Do you accept above message [Y/N]:
+Y
+```
+queue: queue name    
+url1: gcov build package url    
+url2: gcov source package url    
+catecory: shell_long   
+ 
+
+## 4.4 Report issues
+### General issue  
+You can refer to http://jira.cubrid.org/browse/CBRD-21989.   
+![regrssion_issue](./media/image11.png)     
+It is necessary to add such information: `Test Build`,`Test OS`,`Description`,`Repro Steps`,`Expected Result`,`Actual Result` and `Test Cases`.     
+Sometimes we need save database files and logs to analyze this issue.      
+
+### Crash issue   
+Here are examples you can refer to.   
+http://jira.cubrid.org/browse/CBRD-22097  
+http://jira.cubrid.org/browse/CBRD-21772  
+
+The call stack of call file is required to paste in the description.  
+![crash_issue](./media/image12.png)   
+The location of the core file, DB files, and error logs are required.  
+![crash_issue_comment](./media/image13.png)   
+
+## 4.5 Maintenance
+### Delete `do_not_delete_core` Directory
+There are a lot of backup files when we report crash issues,once these issus have been closed,we need to delete them.
+```bash
+$ cd ~/do_not_delete_core/
+$ ls 
+10.2.0.7925-616b134_20180521-143021.tar.gz  AUTO_10.2.0.7773-e468e09_20171225_063924.tar.gz  AUTO_10.2.0.8038-b6e1d4b_20181010_152229.tar.gz  readme.txt
+```
+### Check `ERROR_BACKUP` Directory
+When we execute shell_long test,server appears crash or fatal error,the current db and other important information will be save in ~/ERROR_BACKUP,you need check it for each build and clear them in time.
+```bash
+$ cd ~/ERROR_BACKUP/
+$ ls
+AUTO_10.2.0.8038-b6e1d4b_20181010_152229.tar.gz  AUTO_10.2.0.8254-c015eb2_20190214_005631.tar.gz               AUTO_SERVER-START_10.2.0.8254-c015eb2_20190213_023728.tar.gz
+AUTO_10.2.0.8060-689ccdd_20181019_014026.tar.gz  AUTO_10.2.0.8329-51e235e_20190413_151229.tar.gz               AUTO_SERVER-START_10.2.0.8362-fbf9d84_20190526_055005.tar.gz
+AUTO_10.2.0.8060-689ccdd_20181019_040434.tar.gz  AUTO_10.2.0.8349-bb21e2d_20190428_190725.tar.gz               AUTO_SERVER-START_10.2.0.8362-fbf9d84_20190526_055233.tar.gz
+AUTO_10.2.0.8107-a05cfaa_20181028_053656.tar.gz  AUTO_10.2.0.8362-fbf9d84_20190526_060734.tar.gz
+AUTO_10.2.0.8254-c015eb2_20190213_025432.tar.gz  AUTO_SERVER-START_10.2.0.8254-c015eb2_20190213_020024.tar.gz
+```  
 # 5.Test Case Specification
-## Requirements
+## 5.1 Requirements
 export init_path=$HOME/CTP/shell/init_path
 
-## How To Write Test Case    
+## 5.2 How To Write Test Case    
 It is the same with shell test cases  
    * Test cases: The file extension is ``.sh``, and it is located in ``cases`` subdirectory, naming rule: ``/path/to/test_name/cases/test_name.sh``  
    eg: cubrid-testcases-private/longcase/shell/5hour/bug_bts_4707/cases/bug_bts_4707.sh  
@@ -436,7 +558,7 @@ It is the same with shell test cases
      # clean environment
      finish
 	  ```
-## Example Test Cases
+## 5.3 Example Test Cases
 ```
 $ cat bug_bts_14571.sh 
 #!/bin/sh
@@ -500,7 +622,7 @@ cubrid deletedb $dbname
 finish  
 ```
     
-## Common function in $init_path/init.sh for shell_long cases  
+## 5.4 Common Functions For Shell_long Cases  
 * cubrid_createdb $dbname  
 Sometimes CUBRID need charset to create databases,eg:      
 For CUBRID 9 or higher: cubrid createdb testdb en_us  
@@ -690,9 +812,39 @@ function finish {
   echo "[INFO] TEST STOP (`date`)"
 }
 ```
-*Notice: *
+* format_query_plan  
+When the result have query plan,it maybe unstable,we need use this function.  
+```
+format_query_plan  result${i}.log
+```
 
-## Daily Shell_long Test Cases Path  
+* xkill_pid  
+This function is used for kill process 
+```
+xkill_pid $java_pid
+```
+
+* do_make_locale   
+run make_locale.sh or make_locale.bat for linux or windows  
+```
+do_make_locale release
+do_make_locale debug
+do_make_locale
+```
+
+* xgcc  
+compile C code on linux or windows platform.  
+```
+xgcc -I${CUBRID}/include -L${CUBRID}/lib -lcascci ${MODE}  -o test2 test2.c
+xgcc -o cci cci.c -lpthread
+xgcc -g -o testbug9251 sus9251.c 
+xgcc -o test test.c
+```
+
+
+**Notice: there are other common functions,you can refer to $init_path/init.sh**  
+
+## 5.5 Daily Shell_long Test Cases Path  
 Path: cubrid-testcases-private/longcase/shell  
 ```
 $ find ./ -name "*.sh"                              
