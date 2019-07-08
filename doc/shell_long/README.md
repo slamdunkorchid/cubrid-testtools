@@ -365,7 +365,7 @@ Here's what you might encounter:
 ### Check Failures   
 failures: http://10.113.153.154:10086/qaresult/showFailResult.nhn?m=showFailVerifyItem&statid=21980&srctb=shell_main&failType=shell#  
 ![fail_list](./media/image6.png)   
-Click each case to see [`Case` and `Running log`](http://10.113.153.154:10086/qaresult/showfile.nhn?m=showCaseFile&statid=21980&itemid=2140696&tc=shell_long&buildId=10.2.0.8369-5a75e41&filePath=longcase/shell/1hour/bug_bts_5824/cases/bug_bts_5824.sh&isSuccessFul=false) 
+Click each case to see [`Case` and `Running log`](http://10.113.153.154:10086/qaresult/showfile.nhn?m=showCaseFile&statid=21980&itemid=2140696&tc=shell_long&buildId=10.2.0.8369-5a75e41&filePath=longcase/shell/1hour/bug_bts_5824/cases/bug_bts_5824.sh&isSuccessFul=false)   
 ![details](./media/image7.png)  
 
 test code:  
