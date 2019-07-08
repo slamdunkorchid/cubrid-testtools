@@ -219,7 +219,7 @@ feedback_db_name=qaresu
 feedback_db_user=dba
 feedback_db_pwd=
 ```
-When you need to test shell_long_debug, then need to copy ~/CTP/conf/shell_template_for_shell_long.conf as~ /CTP/conf/shell_template_for_shell_long_debug.conf  
+When you need to test shell_long_debug, then need to copy `~/CTP/conf/shell_template_for_shell_long.conf` as `~/CTP/conf/shell_template_for_shell_long_debug.conf` 
 
 3. touch start_test.sh  
 ```
@@ -345,15 +345,19 @@ sender.sh QUEUE_CUBRID_QA_SHELL_LONG_LINUX http://192.168.1.91:8080/REPO_ROOT/st
 
 ## 4.2 Verify test Results  
 ### Check if there is the test result  
-Go to QA homepage and click the CI build, wait for the page loading, see the 'Function' tab and find the shell_long result.    
-![verify_func_tab](./media/image1.png)   
-The category `shell_long` links to test cases that have been finished in the current test         
-![completed_test_cases](./media/image2.png)       
-The `Fail` column  includes `Total` and `New` column ,The value of `Total` links to the whole failed cases, and the value of `New` links to the new failed cases compared with previous build.    
+1. Go to QA homepage and click the CI build, wait for the page loading, see the 'Function' tab and find the shell_long result.    
+![verify_func_tab](./media/image1.png) 
+
+2. The category `shell_long` links to test cases that have been finished in the current test         
+![completed_test_cases](./media/image2.png)  
+
+3. The `Fail` column  includes `Total` and `New` column ,The value of `Total` links to the whole failed cases, and the value of `New` links to the new failed cases compared with previous build.    
 ![fail_test_cases](./media/image3.png)    
-If it shows **'NO RESULT (OR RUNNING)'** as bellow, maybe you can check whether the crontab task time has not arrived or the test environments have problem.      
+
+4. If it shows **'NO RESULT (OR RUNNING)'** as bellow, maybe you can check whether the crontab task time has not arrived or the test environments have problem.      
 ![verify_no_result](./media/image4.png)      
-Here's what you might encounter:    
+
+5. Here's what you might encounter:    
 * Test message is in the queue(test is not started)   
   Sometimes there is another test executed such as RQG test,shell_heavy test or code coverage test. In this case, just wait for another test to complete.   
 * Insufficient disk space  
@@ -363,9 +367,10 @@ Here's what you might encounter:
   If the CI build comes on time as usual, then you need to check why the test is so slow. It may because there is a server crash, server hangs up, or performance drop. In this case, you need to open a bug.   
   
 ### Check Failures   
-failures: http://10.113.153.154:10086/qaresult/showFailResult.nhn?m=showFailVerifyItem&statid=21980&srctb=shell_main&failType=shell#  
+1. failures: http://10.113.153.154:10086/qaresult/showFailResult.nhn?m=showFailVerifyItem&statid=21980&srctb=shell_main&failType=shell#  
 ![fail_list](./media/image6.png)   
-Click each case to see [`Case` and `Running log`](http://10.113.153.154:10086/qaresult/showfile.nhn?m=showCaseFile&statid=21980&itemid=2140696&tc=shell_long&buildId=10.2.0.8369-5a75e41&filePath=longcase/shell/1hour/bug_bts_5824/cases/bug_bts_5824.sh&isSuccessFul=false)   
+
+2. Click each case to see [`Case` and `Running log`](http://10.113.153.154:10086/qaresult/showfile.nhn?m=showCaseFile&statid=21980&itemid=2140696&tc=shell_long&buildId=10.2.0.8369-5a75e41&filePath=longcase/shell/1hour/bug_bts_5824/cases/bug_bts_5824.sh&isSuccessFul=false)   
 ![details](./media/image7.png)  
 
 test code:  
@@ -417,11 +422,13 @@ job_coverage_test.test.15.scenario=shell_long
 job_coverage_test.test.15.queue=QUEUE_CUBRID_QA_SHELL_LONG_LINUX
 ```
 ### Verify code coverage testing result  
-Go to QA homepage and find the 'code coverage' node in the left area, click the link of latest result.  
+1. Go to QA homepage and find the 'code coverage' node in the left area, click the link of latest result.  
 ![code_cov](./media/image8.png)     
-Click the `shell_long` link.  
+
+2. Click the `shell_long` link.  
 ![code_cov_whole](./media/image9.png)     
-There is a coverage rate of lines. Its coverage rate of lines is usually in 40%~42%.   
+
+3. There is a coverage rate of lines. Its coverage rate of lines is usually in 40%~42%.   
 ![code_cov_shell_long](./media/image10.png)     
 
 ### Send code coverage testing message    
@@ -485,7 +492,8 @@ catecory: shell_long
 ## 4.4 Report issues
 ### General issue  
 You can refer to http://jira.cubrid.org/browse/CBRD-21989.     
-![regrssion_issue](./media/image11.png)     
+![regrssion_issue](./media/image11.png)
+
 It is necessary to add such information: `Test Build`,`Test OS`,`Description`,`Repro Steps`,`Expected Result`,`Actual Result` and `Test Cases`.     
 Sometimes we need save database files and logs to analyze this issue.      
 
@@ -496,6 +504,7 @@ http://jira.cubrid.org/browse/CBRD-21772
 
 The call stack of call file is required to paste in the description.  
 ![crash_issue](./media/image12.png)   
+
 The location of the core file, DB files, and error logs are required.  
 ![crash_issue_comment](./media/image13.png)   
 
