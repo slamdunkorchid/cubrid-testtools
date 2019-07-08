@@ -1,5 +1,5 @@
 # 1. Test Objective  
-The document is to introduce how to test shell_long via CTP. It is similiar with shell test with CTP.For some shell cases, it spend so much time which affects the end of shell regression test, then remove them to shell_long test catagary.    
+The document is to introduce how to test shell_long via CTP. It is similiar with shell test with CTP.For some shell cases, it spend so much time which affects the end of shell regression test, then remove them to shell_long test category.    
 
 # 2. Tools Introduction  
 ## 2.1 CTP tools
@@ -16,7 +16,7 @@ cp -f ${shell_config_template} ${shell_fm_test_conf}
 ctp.sh shell -c $shell_fm_test_conf
 ```
 ## 2.2 Common Tools
-Common tool means the tool which is used by many test suits. For common tools, cubrid_common,cubrid_scheduler, core_analyzer are used in shell_long test for legacy,but now they have been integarated into CTP.
+Common tool means the tool which is used by many test suits. For common tools, cubrid_common,cubrid_scheduler, core_analyzer are used in shell_long test for legacy,but now they have been integrated into CTP.
 ```bash
 cd ~/CTP/common/script
 $ ls -l |awk '{print $NF}' 
@@ -60,10 +60,10 @@ util_filter_supported_parameters.sh
 util_install_build.sh
 ```
 
-# 3. Deploy shell_long Regression Test
+# 3. Deploy Shell_long Regression Test
 In this section, we will introduce how to deploy the Shell_long Regression Test Environment.  
 ## 3.1 Test Machines
-For Shell_long regression test, we usually have one controller node and multiple test nodes.In our regression configurations,we use five test nodes.  
+For shell_long regression test, we usually have one controller node and multiple test nodes.In our regression configurations,we use five test nodes.  
 **Controller node** : This node listens to test messages and starts a test when there is a test message.  
 **Test node** : CUBRID server is deployed on this node,we execute test cases on it. 
 
@@ -270,7 +270,7 @@ Please follow [the guide to install CTP](http://jira.cubrid.org/browse/CUBRIDQA
 ```
 cd ~
 git clone https://github.com/CUBRID/cubrid-testcases-private.git 
-cd ~/cubrid-testtools-internal/
+cd ~/cubrid-testcases-private/
 git checkout develop
 ```
 3. Install CUBRID.
@@ -334,7 +334,7 @@ job_shell_long.test.1.queue=QUEUE_CUBRID_QA_SHELL_LONG_LINUX
 
 
 ## 4.1 Daily regression test
-When the build server has a new build, a shell_long test can be executed. If there is something wrong and need to run shell_long test again, you can send a test message. 
+When the build server has a new build and meet the conditions of the crontab task, a shell_long test will be executed. If there is something wrong and need to run shell_long test again, you can send a test message. 
 ### Send a test message
 1. go to controller node, check `~/CTP/conf/shell_template_for_shell_long.conf`. This config file is only for regression test. We usually don't modify it except we have new test nodes.
 2. login `message@192.168.1.91` and send test message.  
@@ -347,9 +347,9 @@ sender.sh QUEUE_CUBRID_QA_SHELL_LONG_LINUX http://192.168.1.91:8080/REPO_ROOT/st
 ### Check if there is the test result  
 Go to QA homepage and click the CI build, wait for the page loading, see the 'Function' tab and find the shell_long result.    
 ![verify_func_tab](./media/image1.png)   
-The category `shell_long` links to the current completed test cases  
-![completed_test_cases](./media/image2.png)  
-The numbers of `Fail` tag links to the failures, it includes total failures and new failures of this build compared with previous build.        
+The category `shell_long` links to test cases that have been finished in the current test         
+![completed_test_cases](./media/image2.png)       
+The `Fail` column  includes `Total` and `New` column ,The value of `Total` links to the whole failed cases, and the value of `New` links to the new failed cases compared with previous build.    
 ![fail_test_cases](./media/image3.png)    
 If it shows **'NO RESULT (OR RUNNING)'** as bellow, maybe you can check whether the crontab task time has not arrived or the test environments have problem.      
 ![verify_no_result](./media/image4.png)      
@@ -357,16 +357,16 @@ Here's what you might encounter:
 * Test message is in the queue(test is not started)   
   Sometimes there is another test executed such as RQG test,shell_heavy test or code coverage test. In this case, just wait for another test to complete.   
 * Insufficient disk space  
-  Some test case executed failed ,and on `Total` tag  of `Fail` column, we may see `Server crash graphic identifier`   
+  Some test case executed failed ,and on the value of `Total` column, we may see `Server crash graphic identifier`   
 ![Server_crash_graphic_identifier](./media/image5.png)      
 * Test is not finished as expected  
   If the CI build comes on time as usual, then you need to check why the test is so slow. It may because there is a server crash, server hangs up, or performance drop. In this case, you need to open a bug.   
   
 ### Check Failures   
 failures: http://10.113.153.154:10086/qaresult/showFailResult.nhn?m=showFailVerifyItem&statid=21980&srctb=shell_main&failType=shell#  
-![fail_list](./doc/media/image6.png)   
+![fail_list](./media/image6.png)   
 Click each case to see [`Case` and `Running log`](http://10.113.153.154:10086/qaresult/showfile.nhn?m=showCaseFile&statid=21980&itemid=2140696&tc=shell_long&buildId=10.2.0.8369-5a75e41&filePath=longcase/shell/1hour/bug_bts_5824/cases/bug_bts_5824.sh&isSuccessFul=false) 
-![details](./doc/media/image7.png)  
+![details](./media/image7.png)  
 
 test code:  
 ```
@@ -420,9 +420,9 @@ job_coverage_test.test.15.queue=QUEUE_CUBRID_QA_SHELL_LONG_LINUX
 Go to QA homepage and find the 'code coverage' node in the left area, click the link of latest result.  
 ![code_cov](./media/image8.png)     
 Click the `shell_long` link.  
-![code_cov_tpcc](./media/image9.png)     
+![code_cov_whole](./media/image9.png)     
 There is a coverage rate of lines. Its coverage rate of lines is usually in 40%~42%.   
-![code_cov_tpcc2](./media/image10.png)     
+![code_cov_shell_long](./media/image10.png)     
 
 ### Send code coverage testing message    
 login `message@192.168.1.91`    
@@ -469,7 +469,7 @@ BUILD_URLS_KR=http://192.168.1.91:8080/REPO_ROOT/store_01/10.2.0.8270-c897055/dr
 BUILD_URLS_KR_1=http://192.168.1.91:8080/REPO_ROOT/store_01/10.2.0.8270-c897055/drop/cubrid-10.2.0.8270-c897055-gcov-src-Linux.x86_64.tar.gz
 MKEY_COVERAGE_UPLOAD_DIR=/home/codecov/cc4c/result
 MKEY_COVERAGE_UPLOAD_IP=192.168.1.98
-MKEY_COVERAGE_UPLOAD_PWD=uV9b3KMp5%%
+MKEY_COVERAGE_UPLOAD_PWD=******
 MKEY_COVERAGE_UPLOAD_USER=codecov
 
 
@@ -484,7 +484,7 @@ catecory: shell_long
 
 ## 4.4 Report issues
 ### General issue  
-You can refer to http://jira.cubrid.org/browse/CBRD-21989.   
+You can refer to http://jira.cubrid.org/browse/CBRD-21989.     
 ![regrssion_issue](./media/image11.png)     
 It is necessary to add such information: `Test Build`,`Test OS`,`Description`,`Repro Steps`,`Expected Result`,`Actual Result` and `Test Cases`.     
 Sometimes we need save database files and logs to analyze this issue.      
@@ -498,6 +498,15 @@ The call stack of call file is required to paste in the description.
 ![crash_issue](./media/image12.png)   
 The location of the core file, DB files, and error logs are required.  
 ![crash_issue_comment](./media/image13.png)   
+
+We can report shell_long issue though tools:    
+* Click `Server crash graphic identifier`,go to list of failed cases       
+* Click `REPORT ISSUE FOR BELOW CRASH`   
+![report_issue](./media/image14.png)   
+* Enter jira user and password,then click `Analyze Falure`,and click `Submit To Jira`  
+![report_issue2](./media/image15.png)   
+
+
 
 ## 4.5 Maintenance
 ### Delete `do_not_delete_core` Directory
@@ -865,56 +874,7 @@ $ find ./ -name "*.sh"
 ./1hour/bug_bts_15419_2_asc/cases/bug_bts_15419_2_asc.sh
 ./1hour/bug_bts_7350/cases/bug_bts_7350.sh
 ./1hour/_02_cursor_stress/cases/_02_cursor_stress.sh
-./1hour/bug_bts_14602/cases/bug_bts_14602.sh
-./1hour/bug_bts_5808/cases/bug_bts_5808.sh
-./1hour/bug_bts_5775/cases/bug_bts_5775.sh
-./1hour/bug_xdbms4341/cases/bug_xdbms4341.sh
-./1hour/bug_bts_14432/cases/bug_bts_14432.sh
-./1hour/bug_bts_5904/cases/bug_bts_5904.sh
-./1hour/bug_bts_15419_3_asc/cases/bug_bts_15419_3_asc.sh
-./1hour/bug_bts_6007/cases/bug_bts_6007.sh
-./1hour/bug_bts_4931/cases/bug_bts_4931.sh
-./1hour/bug_bts_8163/cases/bug_bts_8163.sh
-./1hour/_03_new_feature_02/cases/_03_new_feature_02.sh
-./1hour/bug_bts_5064/cases/bug_bts_5064.sh
-./1hour/bug_bts_17984/cases/bug_bts_17984.sh
-./1hour/bug_bts_7654/cases/bug_bts_7654.sh
-./1hour/bug_bts_14765/cases/bug_bts_14765.sh
-./1hour/bug_bts_8290/cases/bug_bts_8290.sh
-./1hour/bug_bts_14767/cases/bug_bts_14767.sh
-./1hour/bug_bts_6377/cases/bug_bts_6377.sh
-./1hour/bug_bts_5824/cases/bug_bts_5824.sh
-./1hour/bug_bts_16229/cases/bug_bts_16229.sh
-./1hour/bug_bts_15247/cases/bug_bts_15247.sh
-./1hour/bug_bts_8293/cases/bug_bts_8293.sh
-./1hour/bug_bts_8148/cases/bug_bts_8148.sh
-./_32_features_930/issue_11472_diagdb_show_index/_01_show_created_index/cases/_01_show_created_index.sh
-./other/bug_xdbms_sus1194/cases/bug_xdbms_sus1194.sh
-./other/bug_bts_17835/cases/bug_bts_17835.sh
-./other/bug_bts_4523/cases/bug_bts_4523.sh
-./other/bug_bts_17922/cases/bug_bts_17922.sh
-./other/bug_bts_6981/cases/bug_bts_6981.sh
-./other/bug_bts_14490/cases/bug_bts_14490.sh
-./other/bug_bts_6667/cases/bug_bts_6667.sh
-./other/bug_3627/cases/bug_3627.sh
-./other/cubridsus1959/cases/cubridsus1959.sh
-./other/bug_bts_17951/cases/bug_bts_17951.sh
-./other/bug_bts_17967/cases/bug_bts_17967.sh
-./other/bug_bts_17702/cases/bug_bts_17702.sh
-./other/bug_bts_17675/cases/bug_bts_17675.sh
-./3hour/bug_bts_13718/cases/bug_bts_13718.sh
-./3hour/bug_bts_6635/cases/bug_bts_6635.sh
-./3hour/bug_bts_16219/cases/bug_bts_16219.sh
-./3hour/bug_bts_13592_1/cases/bug_bts_13592_1.sh
-./3hour/bug_bts_14766/cases/bug_bts_14766.sh
-./3hour/bug_bts_13592_2/cases/bug_bts_13592_2.sh
-./_30_banana_qa/issue_9576/cases/issue_9576.sh
-./_06_issues/_15_1h/bug_bts_14571/cases/bug_bts_14571.sh
-./_06_issues/_11_2h/bug_bts_5936/cases/bug_bts_5936.sh
-./_06_issues/_14_2h/bug_bts_13992/cases/bug_bts_13992.sh
-./_06_issues/_14_1h/bug_bts_13186/cases/bug_bts_13186.sh
-./_06_issues/_15_2h/bug_bts_17501/cases/bug_bts_17501.sh
-./_04_misc/_05_query_cache/itrack_10020/cases/itrack_10020.sh
+...
 ./2hour/_02_cursor_stress/cases/_02_cursor_stress.sh
 ./2hour/bug_bts_10009/cases/bug_bts_10009.sh
 ./2hour/bug_bts_9969/cases/bug_bts_9969.sh
